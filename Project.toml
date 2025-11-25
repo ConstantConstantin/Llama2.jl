@@ -1,0 +1,7 @@
+name = "Llama2"
+uuid = "0e620e9f-4534-4490-8f63-949aea0a85e1"
+authors = ["Constantin-Paul Hertel <paul.hertel@aol.de>"]
+version = "1.0.0-DEV"
+
+[compat]
+julia = "1.11"
