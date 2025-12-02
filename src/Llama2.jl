@@ -1,5 +1,7 @@
 module Llama2
 
-# Write your package code here.
+include("tokenizer.jl")
+
+export Tokenizer
 
 end
