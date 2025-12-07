@@ -1,10 +1,11 @@
-struct TokenIndex{VI<:AbstractVector{UInt8}, I<:Integer}
-    str::VI
-    id::I
+struct TokenIndex
 
-    function TokenIndex(str::VI, id::I) where {VI<:AbstractVector{UInt8}, I<:Integer}
-        id < 0 && error("Token index must be > 0.")
-        new{VI, I}(str, id)
+    str::Vector{UInt8}
+    id::Int16
+
+    function TokenIndex(str::AbstractVector{UInt8}, id::Integer)
+        id < 0 && throw(DomainError("Token index must be > 0."))
+        new(convert(Vector{UInt8}, str), convert(Int16, id))
     end
 
 end
@@ -13,44 +14,37 @@ function compare_tokens(first_token::TokenIndex, second_token::TokenIndex)::Bool
     return (first_token.str == second_token.str)
 end
 
-struct Tokenizer{
-    VVI<:AbstractVector{<:AbstractVector{UInt8}}, 
-    VF<:AbstractVector{Float32},  
-    VI<:AbstractVector{UInt8}, 
-    I<:Integer,
-    J<:Integer,
-    VTI<:AbstractVector{<:TokenIndex}
-}
-    vocab::VVI
-    vocab_scores::VF
-    byte_pieces::VI
-    vocab_size::I
-    max_token_length::J
-    sorted_vocab::VTI
+struct Tokenizer
 
-    function Tokenizer(vocab::VVI, 
-        vocab_scores::VF, 
-        byte_pieces::VI,
-        vocab_size::I, 
-        max_token_length::J,
-        sorted_vocab::VTI
-    ) where {
-        VVI<:AbstractVector{<:AbstractVector{UInt8}}, 
-        VF<:AbstractVector{Float32}, 
-        VI<:AbstractVector{UInt8}, 
-        I<:Integer,
-        J<:Integer,
-        VTI<:AbstractVector{<:TokenIndex}
-    }
-        max_token_length < 0 && error("max_token_length must be > 0.")
-        length(byte_pieces) != 256 && error("Length of byte_pieces must be 256.")
+    vocab::Vector{Vector{UInt8}}
+    vocab_scores::Vector{Float32}
+    sorted_vocab::Vector{TokenIndex}
+    vocab_size::Int16
+    max_token_length::UInt16
+    byte_pieces::Vector{UInt8}
+
+    function Tokenizer(vocab::AbstractVector{<:AbstractVector{UInt8}},
+        vocab_scores::AbstractVector{Float32},
+        sorted_vocab::AbstractVector{TokenIndex},
+        vocab_size::Integer,
+        max_token_length::Integer,
+        byte_pieces::AbstractVector{UInt8}
+    )
+        max_token_length < 0 && throw(DomainError("max_token_length must be > 0."))
+        length(byte_pieces) != 256 && throw(ArgumentError("Length of byte_pieces must be 256."))
         
-        new{VVI, VF, VI, I, J, VTI}(vocab, vocab_scores, byte_pieces, vocab_size, max_token_length, sorted_vocab)
+        new(convert(Vector{Vector{UInt8}}, vocab), 
+            convert(Vector{Float32}, vocab_scores), 
+            convert(Vector{TokenIndex}, sorted_vocab), 
+            convert(Int16, vocab_size), 
+            convert(UInt16, max_token_length), 
+            convert(Vector{UInt8}, byte_pieces)
+        )
     end
 end
 function Tokenizer(tokenizer_path::String, vocab_size::Integer)
     byte_pieces = collect(UInt8.(0:255))
-    sorted_vocab = Vector{TokenIndex{Vector{UInt8}, Int}}()
+    sorted_vocab = Vector{TokenIndex}()
 
     vocab_scores = Vector{Float32}(undef, vocab_size)
     vocab = Vector{Vector{UInt8}}(undef, vocab_size)
@@ -66,5 +60,5 @@ function Tokenizer(tokenizer_path::String, vocab_size::Integer)
         end
     end
 
-    Tokenizer(vocab, vocab_scores, byte_pieces, vocab_size, max_token_length, sorted_vocab)
+    Tokenizer(vocab, vocab_scores, sorted_vocab, vocab_size, max_token_length, byte_pieces)
 end
