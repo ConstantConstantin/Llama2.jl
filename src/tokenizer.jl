@@ -1,16 +1,27 @@
 """
-    struct TokenIndex
+    TokenIndex(str::AbstractVector{UInt8}, id::Integer)
 
-A lightweight container representing a token and its integer identifier.
+Create a `TokenIndex` from a byte vector and an integer identifier.
 
-# Fields
-- `str::Vector{UInt8}`: The byte representation of the token.
-- `id::Int16`: The numeric identifier of the token. Must be positive.
+The byte sequence is converted to `Vector{UInt8}` and the ID is
+converted to `Int16`.  
+Throw a `DomainError` if `id ≤ 0`.
 
-# Constructors
-- `TokenIndex(str::AbstractVector{UInt8}, id::Integer)`:  
-  Creates a `TokenIndex` after converting `str` to a `Vector{UInt8}` and  
-  `id` to `Int16`. Throws a `DomainError` if `id ≤ 0`.
+
+# Examples
+```jldoctest
+julia> using Llama2;
+
+julia> TokenIndex([0x61], 1)
+TokenIndex(UInt8[0x61], 1)
+
+julia> TokenIndex([0x61], -1)
+ERROR: DomainError with Token index must be > 0.
+[...]
+```
+
+# Developer Notes
+This is an internal struct.
 
 """
 struct TokenIndex
@@ -28,14 +39,19 @@ end
 """
     compare_tokens(first_token::TokenIndex, second_token::TokenIndex) -> Bool
 
-Compares two `TokenIndex` objects for equality **based solely on their
+Compare two `TokenIndex` objects for equality **based solely on their
 byte-string contents**.  
-Returns `true` if both tokens contain identical `str` fields, regardless of ID.
+Return `true` if both tokens contain identical `str` fields, regardless of ID.
 
 # Examples
-```julia
-compare_tokens(TokenIndex([0x61], 1), TokenIndex([0x61], 2))  # true
-compare_tokens(TokenIndex([0x61], 1), TokenIndex([0x62], 1))  # false
+```jldoctest
+julia> using Llama2;
+
+julia> compare_tokens(TokenIndex([0x61], 1), TokenIndex([0x61], 2))
+true
+
+julia> compare_tokens(TokenIndex([0x61], 1), TokenIndex([0x62], 1))
+false
 ```
 
 """
@@ -44,36 +60,25 @@ function compare_tokens(first_token::TokenIndex, second_token::TokenIndex)::Bool
 end
 
 """
-struct Tokenizer
+    Tokenizer
 
-A tokenizer structure containing vocabulary, scores, and token metadata used for
-byte-level or subword tokenization.
+Construct a tokenizer storing vocabulary entries, scores, and byte-piece mappings.
 
-Fields
+# Constructors
+- `Tokenizer(vocab, vocab_scores, sorted_vocab, vocab_size, max_token_length, byte_pieces)`  
+  Construct a tokenizer directly from the provided fields.  
+  Validate that `max_token_length > 0` and that `byte_pieces` has length 256.
 
-vocab::Vector{Vector{UInt8}}: List of token byte sequences.
+- `Tokenizer(path::String, vocab_size::Integer)`  
+  Load a tokenizer from a binary file.
 
-vocab_scores::Vector{Float32}: Scores associated with each token (e.g., merge scores).
-
-sorted_vocab::Vector{TokenIndex}: A sorted list of token indices (may be
-populated externally after construction).
-
-vocab_size::Int16: Number of tokens in the vocabulary.
-
-max_token_length::UInt16: Maximum number of bytes in any token.
-
-byte_pieces::Vector{UInt8}: A 256-element list of byte values (0-255), used
-for constructing base byte tokens.
-
-Constructors
-
-Tokenizer(vocab, vocab_scores, sorted_vocab, vocab_size, max_token_length, byte_pieces)
-Normalizes input types and validates constraints:
-
-max_token_length must be positive.
-
-length(byte_pieces) must equal 256.
-
+# Fields
+- `vocab`: Token byte sequences.  
+- `vocab_scores`: Scores for each token.  
+- `sorted_vocab`: Sorted token indices.  
+- `vocab_size`: Number of vocabulary entries.  
+- `max_token_length`: Maximum token length in bytes.  
+- `byte_pieces`: Byte mapping (length 256).
 """
 struct Tokenizer
 
@@ -103,41 +108,6 @@ struct Tokenizer
         )
     end
 end
-
-"""
-Tokenizer(tokenizer_path::String, vocab_size::Integer)
-
-Loads a tokenizer from a binary file on disk.
-
-File Format
-
-The file is expected to contain, in order:
-
-Int32 — maximum token length
-
-For each token (repeated vocab_size times):
-
-Float32 — the token's score
-
-Int32 — length of the token in bytes
-
-raw bytes representing the token
-
-Returns
-
-A fully constructed Tokenizer with:
-
-vocab, vocab_scores, and max_token_length loaded from the file
-
-sorted_vocab initialized empty
-
-byte_pieces set to all 256 possible bytes
-
-Throws
-
-ArgumentError, EOFError, or I/O errors if the file lacks the expected structure.
-
-"""
 function Tokenizer(tokenizer_path::String, vocab_size::Integer)
     byte_pieces = collect(UInt8.(0:255))
     sorted_vocab = Vector{TokenIndex}()
