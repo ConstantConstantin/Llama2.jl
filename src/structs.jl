@@ -1,11 +1,11 @@
 struct Config
-    dim::Int
-    hidden_dim::Int
-    n_layers::Int
-    n_heads::Int
-    n_kv_heads::Int
-    vocab_size::Int
-    seq_len::Int
+    dim::Int32
+    hidden_dim::Int32
+    n_layers::Int32
+    n_heads::Int32
+    n_kv_heads::Int32
+    vocab_size::Int32
+    seq_len::Int32
 end
 
 struct TransformerWeights
@@ -20,7 +20,7 @@ struct TransformerWeights
     w2::Array{Float32, 3}
     w3::Array{Float32, 3}
     rms_final_weight::Vector{Float32}
-    wcls::Vector{Float32}
+    wcls::Matrix{Float32}
 end
 
 struct RunState
@@ -42,7 +42,22 @@ struct Transformer
     config::Config
     weights::TransformerWeights
     state::RunState
-    fd::Int
-    data::Vector{Float32}
-    file_size::Int
+    # omitting the fd/file size info for now because the content already should be stored into the fields of config and weights
+
+    function Transformer(config::Config, weights::TransformerWeights)
+        kv_dim = div((config.dim * config.n_kv_heads), config.n_heads)
+        x = Vector{Float32}(undef, config.dim)
+        xb = Vector{Float32}(undef, config.dim)
+        xb2 = Vector{Float32}(undef, config.dim)
+        hb = Vector{Float32}(undef, config.hidden_dim)
+        hb2 = Vector{Float32}(undef, config.hidden_dim)
+        q = Vector{Float32}(undef, config.dim)
+        k = Vector{Float32}(undef, config.dim)
+        v = Vector{Float32}(undef, config.dim)
+        key_cache = Array{Float32, 3}(undef, config.n_layers, config.seq_len, kv_dim)
+        value_cache = Array{Float32, 3}(undef, config.n_layers, config.seq_len, kv_dim)
+        att = Matrix{Float32}(undef, config.n_heads, config.seq_len)
+        logits = Vector{Float32}(undef, config.vocab_size)
+        new(config, weights, RunState(x, xb, xb2, hb, hb2, q, k, v, att, logits, key_cache, value_cache))
+    end
 end
