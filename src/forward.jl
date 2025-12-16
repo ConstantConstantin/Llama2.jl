@@ -1,5 +1,6 @@
 using LoopVectorization: @turbo
 
+
 """
 rmsnorm!(o, x, w)
 Updates the Output of an Layer 'o' with the rmsnorm scaled weights and inputs 'w .* x'.
@@ -83,7 +84,11 @@ function softmax!(x::AbstractVector{T}) where T<:AbstractFloat
     return nothing
 end
 
-
+function forward!(transformer::Transformer)
+    for i in eachindex(transformer.config.n_layers)
+        
+    end
+end
 
 
 
