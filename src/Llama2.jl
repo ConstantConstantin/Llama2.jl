@@ -6,5 +6,8 @@ include("structs.jl")
 include("tokenizer.jl")
 
 include("decode_transformer.jl")
+include("forward.jl")
+
+export rmsnorm!, softmax!
 
 end
