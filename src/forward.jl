@@ -10,11 +10,18 @@ Using @turbo for performance optimization.
 ```jldoctest
 julia> using Llama2;
 
-julia> x = rand(Float32, 24)
-        w = rand(Float32, 24)
-        o = similar(x)
+julia>   x = [1.0f0,2,3];
+julia>   w = [1.0f0,1,1];
+julia>   o = [0.0f0,0,0];
 
-julia> rmsnorm!(o, x, w)
+julia> rmsnorm!(o, x, w) 
+
+julia> o
+3-element Vector{Float32}:
+ 0.46290955
+ 0.9258191
+ 1.3887286
+
 ```
 
 # Developer Notes
@@ -22,9 +29,9 @@ Dimensions of o, x, and w not quite sure yet.
 
 """
 
-function rmsnorm!(o::AbstractVector{T}, x::AbstractVector{T}, w::AbstractVector{T}) where {T<:AbstractFloat}
+function rmsnorm!(o::Vector{T}, x::Vector{T}, w::Vector{T}) where {T<:Float32}
 
-    @assert length(o) == length(x) == length(w) "x, o, and w must have the same length"
+    @assert length(w) == length(o) == length(x) "x, o, and w must have the same dimensions"
     @assert !isempty(x) "x must not be empty"
 
     ss = 0.0
@@ -58,14 +65,20 @@ Using @turbo for performance optimization.
 ```jldoctest
 julia> using Llama2;
 
-julia> x = rand(Float32, 24)
+julia> x = [-1.0f0,0,1];
 
 julia> softmax!(x)
+
+julia> x
+3-element Vector{Float32}:
+ 0.09003057
+ 0.24472845
+ 0.66524094
 ```
 
 """
 
-function softmax!(x::AbstractVector{T}) where T<:AbstractFloat
+function softmax!(x::Vector{Float32})
 
     @assert !isempty(x) "x must not be empty"
 
