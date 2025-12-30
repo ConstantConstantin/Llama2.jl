@@ -2,10 +2,11 @@ module Llama2
 
 using StatsBase: wsample
 
-export Tokenizer, TokenIndex, compare_tokens, str_lookup, encode, talktollm
-
+export Tokenizer, TokenIndex, isless_tokens, str_lookup, encode, ProbIndex, Sampler, sample_mult, isless_probindex, sample_topp, talktollm
+# Write your package code here.
 include("structs.jl")
 include("tokenizer.jl")
+include("sampler.jl")
 include("decode_transformer.jl")
 include("forward.jl")
 
