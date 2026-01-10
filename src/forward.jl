@@ -13,9 +13,6 @@ julia> using Llama2;
 julia>   x = [1.0f0,2,3];
 julia>   w = [1.0f0,1,1];
 julia>   o = [0.0f0,0,0];
-julia>   x = [1.0f0,2,3];
-julia>   w = [1.0f0,1,1];
-julia>   o = [0.0f0,0,0];
 
 julia> rmsnorm!(o, x, w) 
 
@@ -97,5 +94,42 @@ function softmax!(x::Vector{Float32})
         x[i] *= norm
     end
 
+    return nothing
+end
+
+function forward!(transformer::Transformer)
+
+    config = transformer.config
+    weights = transformer.weights
+    state = transformer.state
+
+    seq_len = config.seq_len
+    dim = config.dim
+    n_kv_heads = config.n_kv_heads
+    head_size = div(dim, n_heads)
+    hidden_dim = config.hidden_dim
+
+    # assigning input token embedding to x
+    @views content_row = weights.token_embedding_table[token, :]
+    x .= content_row
+
+    """
+    currently not in our Trainsformerweight Struct? 
+
+    freq_cis_real_row = weights.freq_cis_real[:, pos]
+    freq_cis_imag_row = weights.freq_cis_imag[:, pos]
+    """
+
+    for l in 1:config.n_layers
+        rmsnorm!(state.xb, state.x, weights.rms_att_weight[:, l])
+        # matmul to get q, k, v
+
+        for h in 1:config.n_heads # multi-head attention
+            
+        end
+    end
+
+    rmsnorm!(state.x, state.x, weights.rms_final_weight) # final rmsnorm
+    #transform into logits
     return nothing
 end
