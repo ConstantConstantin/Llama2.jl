@@ -1,6 +1,5 @@
 using LoopVectorization: @turbo
 
-
 """
 rmsnorm!(o, x, w)
 Updates the Output of an Layer 'o' with the rmsnorm scaled weights and inputs 'w .* x'.
@@ -27,30 +26,18 @@ julia> o
 # Developer Notes
 Dimensions of o, x, and w not quite sure yet.
 """
-function rmsnorm!(o::Vector{T}, x::Vector{T}, w::Vector{T}) where {T<:Float32}
+function rmsnorm(x::Vector{T}, w::Vector{T}) where {T<:Float32}
 
     (length(w) != length(o) || length(o) != length(x)) && throw(DimensionMismatch("x, o, and w must have the same dimensions"))
     isempty(x) && throw(ArgumentError("x must not be empty"))
 
-    ss = 0.0
-
     #calculate sum of squares
-
-    @turbo for i in eachindex(x)
-        ss += x[i] * x[i]
-    end
-
+    ss = dot(x, x)
 
     ss = ss / length(x) + 1e-5
     scale = inv(sqrt(ss))
 
-    #normalize and scale 
-
-    @turbo for i in eachindex(x)
-        o[i] = w[i] * scale * x[i]
-    end
-
-    return nothing
+    return scale * w .* x
 end
 
 
@@ -86,9 +73,7 @@ function softmax!(x::Vector{Float32})
 
     norm = inv(sum(x))
 
-    @turbo for i in eachindex(x)
-        x[i] *= norm
-    end
+    x *= norm
 
     return nothing
 end
@@ -108,20 +93,20 @@ function forward!(transformer::Transformer, token::Int32, pos::Int32)
     seq_len = config.seq_len
 
     # assigning input token embedding to x
-    x .= weights.token_embedding_table[token, :]
+    x .= weights.token_embedding_table[token * dim, :]
 
     for l in 1:config.n_layers
         
-        rmsnorm!(state.xb, x, weights.rms_att_weight[:, l])
+        xb = rmsnorm(x, weights.rms_att_weight[l * dim, :])
 
         loff = l * seq_len * kv_dim
-        state.k = @view state.key_cache[loff, pos * kv_dim, :]
-        state.v = @view state.value_cache[loff, pos * kv_dim, :]
+        k = @view state.key_cache[loff, pos * kv_dim, :]
+        v = @view state.value_cache[loff, pos * kv_dim, :]
         # matmul to get q, k, v
 
         state.q = weights.wq[l * dim * dim, :, :] * state.xb
-        state.k .= weights.wk[l * dim * kv_dim] * state.xb
-        state.v .= weights.wv[l * dim * kv_dim] * state.xb
+        k .= weights.wk[l * dim * kv_dim] * state.xb
+        v .= weights.wv[l * dim * kv_dim] * state.xb
 
         for i in 1:2:dim
 
@@ -146,7 +131,7 @@ function forward!(transformer::Transformer, token::Int32, pos::Int32)
             q = state.q[(h * head_size):((h + 1) * head_size)]
             att = @view state.att[h, :]
 
-            for t in 0:pos
+            for t in 1:(pos + 1)
 
                 k = state.key_cache[loff, t * kv_dim, (div(h, kv_mul) * head_size):((div(h, kv_mul) + 1) * head_size)]
 
@@ -157,14 +142,14 @@ function forward!(transformer::Transformer, token::Int32, pos::Int32)
 
             softmax!(att, pos + 1)
 
-            xb = @view state.xb[(h * head_size):((h + 1) * head_size)]
+            xb_head = @view xb[(h * head_size):((h + 1) * head_size)]
 
-            for t in 0:pos
+            for t in 1:(pos + 1)
 
                 v = state.value_cache[loff, t * kv_dim, (div(h, kv_mul) * head_size):((div(h, kv_mul) + 1) * head_size)]
                 a = att[t]
                 
-                xb += a * v
+                xb_head += a * v
 
             end
 
@@ -174,7 +159,7 @@ function forward!(transformer::Transformer, token::Int32, pos::Int32)
 
         x += state.xb2
 
-        rmsnorm!(state.xb, x, weights.rms_ffn_weight[l, :])
+        xb = rmsnorm(x, weights.rms_ffn_weight[l, :])
 
         state.hb = weights.w1[l * dim * hidden_dim, :, :] * state.xb
         state.hb2 = weights.w3[l * dim * hidden_dim, :, :] * state.xb
@@ -192,7 +177,7 @@ function forward!(transformer::Transformer, token::Int32, pos::Int32)
         
     end
 
-    rmsnorm!(state.x, state.x, weights.rms_final_weight) # final rmsnorm
+    x .= rmsnorm(x, weights.rms_final_weight) # final rmsnorm
     
     # classifier into logits
     state.logits = weights.wcls * x
