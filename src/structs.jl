@@ -47,18 +47,13 @@ Create a `RunState` containing several `Float32` containers. These reflect the s
 # Developer Notes
 This is an internal struct.
 """
-mutable struct RunState
+struct RunState
     x::Vector{Float32}
-    xb2::Vector{Float32}
-    hb::Vector{Float32}
-    hb2::Vector{Float32}
-    q::Vector{Float32}
     att::Matrix{Float32}
     logits::Vector{Float32}
     key_cache::Array{Float32, 3}
     value_cache::Array{Float32, 3}
 end
-
 
 struct Transformer
     config::Config
@@ -77,14 +72,10 @@ This is an internal struct.
     function Transformer(config::Config, weights::TransformerWeights)
         kv_dim = div((config.dim * config.n_kv_heads), config.n_heads)
         x = Vector{Float32}(undef, config.dim)
-        xb2 = Vector{Float32}(undef, config.dim)
-        hb = Vector{Float32}(undef, config.hidden_dim)
-        hb2 = Vector{Float32}(undef, config.hidden_dim)
-        q = Vector{Float32}(undef, config.dim)
         key_cache = Array{Float32, 3}(undef, config.n_layers, config.seq_len, kv_dim)
         value_cache = Array{Float32, 3}(undef, config.n_layers, config.seq_len, kv_dim)
         att = Matrix{Float32}(undef, config.n_heads, config.seq_len)
         logits = Vector{Float32}(undef, config.vocab_size)
-        new(config, weights, RunState(x, xb2, hb, hb2, q, att, logits, key_cache, value_cache))
+        new(config, weights, RunState(x, att, logits, key_cache, value_cache))
     end
 end
