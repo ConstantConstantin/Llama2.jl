@@ -25,11 +25,12 @@ Dimensions of o, x, and w not quite sure yet.
 """
 function rmsnorm(x::Vector{Float32}, w::Vector{Float32})
 
-    (length(w) != length(o) || length(o) != length(x)) && throw(DimensionMismatch("x, o, and w must have the same dimensions"))
+    (length(w) != length(x)) && throw(DimensionMismatch("x and w must have the same dimensions"))
     isempty(x) && throw(ArgumentError("x must not be empty"))
 
     #calculate sum of squares
-    ss = dot(x, x)
+    ss = 0.0f0
+    ss += sum(x .^ 2)
 
     ss = ss / length(x) + 1e-5
     scale = inv(sqrt(ss))
@@ -86,35 +87,35 @@ function forward!(transformer::Transformer, token::Int32, pos::Int32)
     kv_dim = div(config.dim * config.n_kv_heads, config.n_heads)
     kv_mul = div(config.n_heads, config.n_kv_heads)
     hidden_dim = config.hidden_dim
-    head_size = div(dim, n_heads)
+    head_size = div(dim, config.n_heads)
     seq_len = config.seq_len
 
     # assigning input token embedding to x
-    x .= weights.token_embedding_table[token * dim, :]
+    x .= weights.token_embedding_table[token, :]
 
     for l in 1:config.n_layers
-        
-        xb = rmsnorm(x, weights.rms_att_weight[l * dim, :])
+        print(config.n_layers)
+        xb = rmsnorm(x, weights.rms_att_weight[l, :])
 
         loff = l * seq_len * kv_dim
-        k = @view state.key_cache[loff, pos * kv_dim, :]
-        v = @view state.value_cache[loff, pos * kv_dim, :]
+        k = @view state.key_cache[l, pos * kv_dim + 1, :]
+        v = @view state.value_cache[l, pos * kv_dim + 1, :]
         # matmul to get q, k, v
 
-        state.q = weights.wq[l * dim * dim, :, :] * state.xb
-        k .= weights.wk[l * dim * kv_dim] * state.xb
-        v .= weights.wv[l * dim * kv_dim] * state.xb
+        state.q = weights.wq[l, :, :] * xb
+        k .= weights.wk[l * dim * kv_dim] * xb
+        v .= weights.wv[l * dim * kv_dim] * xb
 
         for i in 1:2:dim
 
             head_dim = i % head_size
-            freq = 1.0f / (10000.0f^(head_dim / head_size))
+            freq = 1.0f0 / (10000.0f0^(head_dim / head_size))
             val = pos * freq
             fcr = cos(val)
             fci = sin(val)
             
             for v in 1:(1 + (i < kv_dim))
-                vec = v == 0 ? state.q : state.k
+                vec = v == 0 ? state.q : k
                 v0 = vec[i]
                 v1 = vec[i + 1]
                 vec[i] = v0 * fcr - v1 * fci

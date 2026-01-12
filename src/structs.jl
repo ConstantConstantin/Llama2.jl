@@ -47,7 +47,7 @@ Create a `RunState` containing several `Float32` containers. These reflect the s
 # Developer Notes
 This is an internal struct.
 """
-struct RunState
+mutable struct RunState
     x::Vector{Float32}
     xb2::Vector{Float32}
     hb::Vector{Float32}
