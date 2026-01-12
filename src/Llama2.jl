@@ -14,11 +14,7 @@ function talktollm(modelpath::String, vocabpath::String, prompt::String, max_tok
     tok = Tokenizer(vocabpath, t.config.vocab_size-268)
     input_tokens = encode(tok, prompt)
 
-    print(input_tokens)
-
-    forward!(t, Int32(input_tokens[1]), Int32(0))
-
-    return nothing
+    return forward!(t, Int32(input_tokens[1]), Int32(0))
 end
 
 export talktollm
