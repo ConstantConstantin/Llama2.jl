@@ -81,11 +81,10 @@ function forward!(transformer::Transformer, token::Int32, pos::Int32)
     state = transformer.state
 
     dim = config.dim
-    kv_dim = div(config.dim * config.n_kv_heads, config.n_heads)
+    kv_dim = div(dim * config.n_kv_heads, config.n_heads)
     kv_mul = div(config.n_heads, config.n_kv_heads)
     hidden_dim = config.hidden_dim
     head_size = div(dim, config.n_heads)
-    seq_len = config.seq_len
 
     # assigning input token embedding to x
     x = @view weights.token_embedding_table[token, :]
@@ -94,13 +93,13 @@ function forward!(transformer::Transformer, token::Int32, pos::Int32)
 
         xb = rmsnorm(x, weights.rms_att_weight[l, :])
 
-        k = @view state.key_cache[l, pos * kv_dim + 1, :]
-        v = @view state.value_cache[l, pos * kv_dim + 1, :]
+        k = @view state.key_cache[l, pos + 1, :]
+        v = @view state.value_cache[l, pos + 1, :]
         # matmul to get q, k, v
 
         q = weights.wq[l, :, :] * xb
-        k .= weights.wk[l * dim * kv_dim] * xb
-        v .= weights.wv[l * dim * kv_dim] * xb
+        k .= weights.wk[l, :, :] * xb
+        v .= weights.wv[l, :, :] * xb
 
         for i in 1:2:dim
 
