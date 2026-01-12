@@ -24,7 +24,7 @@ julia> o = Llama2.rmsnorm(x, w)
 # Developer Notes
 Dimensions x and w not quite sure yet.
 """
-function rmsnorm(x::Vector{Float32}, w::Vector{Float32})
+function rmsnorm(x::AbstractVector{Float32}, w::AbstractVector{Float32})
 
     (length(w) != length(x)) && throw(DimensionMismatch("x and w must have the same dimensions"))
     isempty(x) && throw(ArgumentError("x must not be empty"))
@@ -80,7 +80,6 @@ function forward!(transformer::Transformer, token::Int32, pos::Int32)
     weights = transformer.weights
     state = transformer.state
 
-    x = state.x
     dim = config.dim
     kv_dim = div(config.dim * config.n_kv_heads, config.n_heads)
     kv_mul = div(config.n_heads, config.n_kv_heads)
@@ -89,7 +88,7 @@ function forward!(transformer::Transformer, token::Int32, pos::Int32)
     seq_len = config.seq_len
 
     # assigning input token embedding to x
-    x .= weights.token_embedding_table[token, :]
+    x = @view weights.token_embedding_table[token, :]
 
     for l in 1:config.n_layers
 
@@ -124,7 +123,7 @@ function forward!(transformer::Transformer, token::Int32, pos::Int32)
         for h in 1:config.n_heads # multi-head attention
 
             q_head = @view q[((h - 1)* head_size + 1):(h  * head_size)]
-            att = @view state.att[h, :]
+            att = Vector{Float32}(undef, pos + 1)
 
             for t in 1:(pos + 1)
 
@@ -135,7 +134,7 @@ function forward!(transformer::Transformer, token::Int32, pos::Int32)
 
             end
 
-            softmax!(@view att[1:(pos + 1)])
+            softmax!(att)
 
             xb_head = @view xb[((h - 1) * head_size + 1):(h * head_size)]
 
