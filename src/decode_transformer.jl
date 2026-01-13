@@ -42,13 +42,13 @@ function Transformer(path::String)
         rms_ffn_weight = Matrix{Float32}(undef, n_layers, config.dim)
         read!(data, rms_ffn_weight)
         
-        w1 = Array{Float32, 3}(undef, n_layers, config.dim, config.hidden_dim)
+        w1 = Array{Float32, 3}(undef, n_layers, config.hidden_dim, config.dim)
         read!(data, w1)
         
-        w2 = Array{Float32, 3}(undef, n_layers, config.hidden_dim, config.dim)
+        w2 = Array{Float32, 3}(undef, n_layers, config.dim, config.hidden_dim)
         read!(data, w2)
         
-        w3 = Array{Float32, 3}(undef, n_layers, config.dim, config.hidden_dim)
+        w3 = Array{Float32, 3}(undef, n_layers, config.hidden_dim, config.dim)
         read!(data, w3)
         
         rms_final_weight = Vector{Float32}(undef, config.dim)

@@ -11,5 +11,5 @@ StatsBase = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
 [compat]
 LinearAlgebra = "1.11.0"
 LoopVectorization = "0.12.173"
-StatsBase = "0.34.10"
+StatsBase = "0.34.9"
 julia = "1.11"

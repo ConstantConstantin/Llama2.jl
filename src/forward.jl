@@ -152,8 +152,8 @@ function forward!(transformer::Transformer, token::Int32, pos::Int32)
 
         xb = rmsnorm(x, weights.rms_ffn_weight[l, :])
 
-        hb = permutedims(weights.w1[l, :, :]) * xb
-        hb2 = permutedims(weights.w3[l, :, :]) * xb
+        hb = weights.w1[l, :, :] * xb
+        hb2 = weights.w3[l, :, :] * xb
 
         for i in 1:hidden_dim
             val = hb[i]
@@ -162,7 +162,7 @@ function forward!(transformer::Transformer, token::Int32, pos::Int32)
             hb[i] = val
         end
 
-        xb = permutedims(weights.w2[l, :, :]) * hb
+        xb = weights.w2[l, :, :] * hb
 
         x += xb
     end
