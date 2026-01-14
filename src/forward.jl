@@ -52,7 +52,7 @@ julia> Llama2.softmax!(x)
 julia> x
 3-element Vector{Float32}:
  0.09003057
- 0.24472845
+ 0.24472846
  0.66524094
 ```
 """
