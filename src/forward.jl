@@ -66,7 +66,7 @@ function softmax!(x::AbstractVector{Float32})
         x[i] = exp(x[i] - max_x)
     end
 
-    x /= sum(x)
+    x ./= sum(x)
 
     return nothing
 end
