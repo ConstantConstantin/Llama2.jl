@@ -186,7 +186,7 @@ function encode(tokenizer::Tokenizer, text::String)
     end
 
     while true
-        best_score = -1e10
+        best_score = -1.0f10
         best_id = -1
         best_idx = -1
 
