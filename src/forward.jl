@@ -1,7 +1,3 @@
-using LinearAlgebra: dot
-
-using LoopVectorization: @turbo
-
 """
     rmsnorm(x, w)
 
@@ -19,9 +15,6 @@ julia> o = Llama2.rmsnorm(x, w)
  0.9258191
  1.3887286
 ```
-
-# Developer Notes
-Dimensions x and w not quite sure yet.
 """
 function rmsnorm(x::AbstractVector{Float32}, w::AbstractVector{Float32})
 
@@ -41,18 +34,17 @@ end
 """
 softmax!(x)
 Updates the Output of an Layer 'x' with the softmax of the input.
-Using @turbo for performance optimization.
 
 # Examples
 ```jldoctest
 julia> x = [-1.0f0,0,1];
 
-julia> Llama2.softmax!(x)
+julia> Llama2.softmax!(x);
 
 julia> x
 3-element Vector{Float32}:
  0.09003057
- 0.24472846
+ 0.24472848
  0.66524094
 ```
 """
@@ -62,13 +54,13 @@ function softmax!(x::AbstractVector{Float32})
 
     max_x = maximum(x)
 
-    @turbo for i in eachindex(x)
+    for i in eachindex(x)
         x[i] = exp(x[i] - max_x)
     end
 
     x ./= sum(x)
 
-    return nothing
+    return x
 end
 
 function forward!(transformer::Transformer, token::Int32, pos::Int32)

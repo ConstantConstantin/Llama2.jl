@@ -1,8 +1,9 @@
 module Llama2
 
 using StatsBase: wsample
+using LinearAlgebra: dot
 
-export Tokenizer, TokenIndex, compare_tokens, str_lookup, encode, talktollm
+export Tokenizer, talktollm
 
 include("structs.jl")
 include("tokenizer.jl")
@@ -17,8 +18,6 @@ model from `modelpath` and the corresponding tokenizer from `vocabpath`. It take
 `prompt` string to start the text generation and generates up to `max_tokens` tokens.
 
 ```julia
-julia> using Llama2;
-
 julia> talktollm("/PATH/TO/MODEL.bin"
                 ,"/PATH/TO/VOCAB.bin"
                 ,"hey whats up?", 100);

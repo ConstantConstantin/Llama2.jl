@@ -4,8 +4,26 @@ You want to understand how this package works or modify the code you are running
 
 ## Tokenizer
 
-Explain `Tokenizer` and surrounding functionality.
+```@docs
+Tokenizer
+Llama2.TokenIndex
+Llama2.compare_tokens
+Llama2.str_lookup
+Llama2.encode
+```
 
 ## Transformer
 
-Explain `Transformer` and surrounding functionality.
+```@docs
+Llama2.Transformer
+Llama2.Config
+Llama2.TransformerWeights
+Llama2.RunState
+```
+
+## forward!
+
+```@docs
+Llama2.rmsnorm
+Llama2.softmax!
+```

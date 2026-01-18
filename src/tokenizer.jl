@@ -1,28 +1,24 @@
 """
     TokenIndex(str::String, id::Integer)
 
-Create a `TokenIndex` from a string and an integer identifier.
+Create a `TokenIndex` from `str` and the identifier `id`.
 
 The byte sequence is converted to `String` and the ID is
 converted to `Int16`.  
 Throw a `DomainError` if `id ≤ 0`.
 
-
 # Examples
 ```jldoctest
-julia> using Llama2;
+julia> Llama2.TokenIndex("Julia", 1)
+Llama2.TokenIndex("Julia", 1)
 
-julia> TokenIndex("Julia", 1)
-TokenIndex("Julia", 1)
-
-julia> TokenIndex("Julia", -1)
+julia> Llama2.TokenIndex("Julia", -1)
 ERROR: DomainError with Token index must be > 0.
 [...]
 ```
 
 # Developer Notes
 This is an internal struct.
-
 """
 struct TokenIndex
 
@@ -39,20 +35,17 @@ end
 """
     compare_tokens(first_token::TokenIndex, second_token::TokenIndex) -> Bool
 
-Compare two `TokenIndex` objects by their string values.
-It returns `true` if the first token's string is **lexicographically** less than the second's, and `false` otherwise.
+Compare two `first_token` and `scond_token` by their string values.
+It returns `true` if `first_token`'s string is **lexicographically** less than the second's, and `false` otherwise.
 
 # Examples
 ```jldoctest
-julia> using Llama2;
-
-julia> compare_tokens(TokenIndex("A", 1), TokenIndex("B", 2))
+julia> Llama2.compare_tokens(Llama2.TokenIndex("A", 1), Llama2.TokenIndex("B", 2))
 true
 
-julia> compare_tokens(TokenIndex("B", 1), TokenIndex("A", 2))
+julia> Llama2.compare_tokens(Llama2.TokenIndex("B", 1), Llama2.TokenIndex("A", 2))
 false
 ```
-
 """
 function compare_tokens(first_token::TokenIndex, second_token::TokenIndex)::Bool
     return isless(first_token.str, second_token.str)
@@ -131,21 +124,18 @@ end
 """
     str_lookup(str::String, sorted_vocab::Vector{TokenIndex}) -> Int16
 
-Search for a given string `str` within a sorted vocabulary `sorted_vocab` of `TokenIndex` objects.
-If the string is found, it returns the corresponding token ID;
+Search for `str` within a sorted vocabulary `sorted_vocab`.
+If a match is found, it returns the corresponding token ID;
 **otherwise, it returns `-1`.** It uses a binary search for efficient lookup.
 
 # Examples
 ```jldoctest
-julia> using Llama2;
-
-julia> str_lookup("aa", [TokenIndex("aa", 1), TokenIndex("bb", 2)])
+julia> Llama2.str_lookup("aa", [Llama2.TokenIndex("aa", 1), Llama2.TokenIndex("bb", 2)])
 1
 
-julia> str_lookup("ba", [TokenIndex("aa", 1), TokenIndex("bb", 2)])
+julia> Llama2.str_lookup("ba", [Llama2.TokenIndex("aa", 1), Llama2.TokenIndex("bb", 2)])
 -1
 ```
-
 """
 function str_lookup(str::String, sorted_vocab::Vector{TokenIndex})::Int16
 
@@ -159,13 +149,12 @@ function str_lookup(str::String, sorted_vocab::Vector{TokenIndex})::Int16
 end
 
 """
-    encode
+    encode(tokenizer::Tokenizer, text::String)
 
-Converts a string `text` into a sequence of token IDs using a `Tokenizer`.
+Converts `text` into a sequence of token IDs using `tokenizer`.
 First ensure the tokenizer's vocabulary is sorted, then encode each character into its corresponding ID.
 After that, iteratively merge token pairs with the highest scores to form longer tokens until no more merges are possible.
 Return the final token ID sequence.
-
 """
 function encode(tokenizer::Tokenizer, text::String)
 
@@ -186,7 +175,7 @@ function encode(tokenizer::Tokenizer, text::String)
     end
 
     while true
-        best_score = -1e10
+        best_score = -1f10
         best_id = -1
         best_idx = -1
 

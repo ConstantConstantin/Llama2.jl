@@ -9,4 +9,9 @@ wget https://huggingface.co/karpathy/tinyllamas/resolve/main/stories15M.bin
 ```
 
 ## Inferencing
-We need more working code for this.
+
+You can either generate a single text, optionally giving an input prompt, or have an interactive chat (TODO).
+
+```@docs
+talktollm
+```
