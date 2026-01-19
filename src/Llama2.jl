@@ -48,7 +48,6 @@ function talktollm(modelpath::String, vocabpath::String, prompt::String, max_tok
             next = wsample(logits)
         end
 
-        
         next == 2 && break
         
         print(tok.vocab[next])
