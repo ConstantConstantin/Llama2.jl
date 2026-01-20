@@ -5,7 +5,7 @@ You want to understand how this package works or modify the code you are running
 ## Tokenizer
 
 ```@docs
-Tokenizer
+Llama2.Tokenizer
 Llama2.TokenIndex
 Llama2.compare_tokens
 Llama2.str_lookup
