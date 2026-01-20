@@ -1,7 +1,7 @@
 _vocabpath = normpath(joinpath(@__DIR__, "..", "data", "tokenizer.bin"))
 
 """
-    talktollm(modelpath::String, prompt::String[, max_tokens::Int]; vocabpath::String, verbose::Bool)
+    talktollm(modelpath::String, [prompt::String]; max_tokens::Int, vocabpath::String, verbose::Bool)
 
 Generate text using a pretrained LLama2 transformer model.
 Return that text as a `String`.
@@ -24,7 +24,7 @@ They decided to sit down and read the book together. They read about a beautiful
 From that day on, they would sit down and read the book every night before bed. They hoped that when they finished reading it, something magical would happen.
 ```
 """
-function talktollm(modelpath::String, prompt::String = "", max_tokens::Int=255; vocabpath::String = _vocabpath, verbose::Bool = false)
+function talktollm(modelpath::String, prompt::String = ""; max_tokens::Int=255, vocabpath::String = _vocabpath, verbose::Bool = false)
 
     transformer = Transformer(modelpath)
     tok = Tokenizer(vocabpath, transformer.config.vocab_size)
