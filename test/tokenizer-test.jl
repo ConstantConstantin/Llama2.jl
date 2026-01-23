@@ -1,5 +1,3 @@
-using Llama2
-using Test
 
 @testset "tokenizer" begin
     @testset "TokenIndex" begin

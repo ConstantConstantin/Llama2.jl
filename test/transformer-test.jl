@@ -1,5 +1,3 @@
-using Llama2
-using Test
 
 @testset "Transformer" begin
         # Load model
@@ -33,4 +31,82 @@ using Test
 
         # Final RMS weight should be a vector over model dim.
         @test length(w.rms_final_weight) == cfg.dim
+         # TODO: move to test of structs, when available
+    @testset "Transformer.Config" begin
+        c = t.config
+
+        @test c.dim == 288
+        @test c.hidden_dim == 768
+        @test c.n_layers == 6
+        @test c.n_heads == 6
+        @test c.n_kv_heads == 6
+        @test c.vocab_size == 32000
+        @test c.seq_len == 256
+
+        end
+
+    @testset "Transformer.TransformerWeights" begin
+
+        w = t.weights
+
+        # testing every single value is too much
+        # we resort to testing single values at the beginning and along the axes of the containers
+        # this assures correct reading of a value, correct location within the data and
+        # correct interpretation of the axes within a container
+
+        @test w.token_embedding_table[1, 1] == -0.059824646f0
+        @test w.token_embedding_table[1, 2] == -0.014561243f0
+        @test w.token_embedding_table[2, 1] == -0.017096385f0
+
+        @test w.rms_att_weight[1, 1] == 0.79829437f0
+        @test w.rms_att_weight[1, 2] == 0.7969791f0
+        @test w.rms_att_weight[2, 1] == 1.1206539f0
+
+        @test w.rms_ffn_weight[1, 1] == 1.0146376f0
+        @test w.rms_ffn_weight[1, 2] == 0.9703832f0
+        @test w.rms_ffn_weight[2, 1] == 1.1049336f0
+
+        @test w.wq[1, 1, 1] == 0.03963275f0
+        @test w.wq[1, 1, 2] == -0.063102335f0
+        @test w.wq[1, 2, 1] == -0.0045094043f0
+        @test w.wq[2, 1, 1] == 0.005027403f0
+
+        @test w.wk[1, 1, 1] == 0.021850083f0
+        @test w.wk[1, 1, 2] == 0.0113122715f0
+        @test w.wk[1, 2, 1] == -5.9539005f-5
+        @test w.wk[2, 1, 1] == 0.012895294f0
+
+        @test w.wv[1, 1, 1] == -0.012940487f0
+        @test w.wv[1, 1, 2] == -0.020094391f0
+        @test w.wv[1, 2, 1] == 0.01877362f0
+        @test w.wv[2, 1, 1] == -0.0013144497f0
+
+        @test w.wo[1, 1, 1] == 0.009332931f0
+        @test w.wo[1, 1, 2] == -0.023395995f0
+        @test w.wo[2, 1, 1] == -0.01163089f0
+        @test w.wo[1, 2, 1] == 0.011191372f0
+        
+        @test w.w1[1, 1, 2] == -0.021039095f0
+        @test w.w1[1, 1, 1] == -0.03274832f0
+        @test w.w1[2, 1, 1] == -0.00537954f0
+        @test w.w1[1, 2, 1] == -0.030032795f0
+
+        @test w.w2[1, 1, 2] == 0.02511926f0
+        @test w.w2[1, 1, 1] == 0.0029473635f0
+        @test w.w2[2, 1, 1] == 0.027657198f0
+        @test w.w2[1, 2, 1] == 0.009355266f0
+
+        @test w.w3[1, 1, 2] == 0.004169304f0
+        @test w.w3[1, 1, 1] == -0.015980158f0
+        @test w.w3[2, 1, 1] == -0.015687676f0
+        @test w.w3[1, 2, 1] == -0.00055685936f0
+
+        @test w.rms_final_weight[2] == 7.1879797f0
+        @test w.rms_final_weight[1] == 7.676849f0
+
+        @test w.wcls[1, 2] == -0.014561243f0
+        @test w.wcls[1, 1] == -0.059824646f0
+        
+        @test w.wcls[2, 1] == -0.017096385f0
+        end
     end

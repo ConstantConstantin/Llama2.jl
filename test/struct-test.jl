@@ -1,5 +1,4 @@
-using Llama2
-using Test
+
 
 @testset "structs" begin
         # Basic smoke tests for the core structs — nothing fancy, just type/shape sanity.
@@ -20,18 +19,18 @@ using Test
         @testset "TransformerWeights" begin
             # Build a weights container with random Float32 arrays matching expected ranks.
             t = Llama2.TransformerWeights(
-                rand(Float32, 10, 20),
-                rand(Float32, 4, 20),
-                rand(Float32, 4, 20),
-                rand(Float32, 4, 20, 20),
-                rand(Float32, 4, 20, 20),
-                rand(Float32, 4, 20, 20),
-                rand(Float32, 20, 20, 4),
-                rand(Float32, 4, 20, 80),
-                rand(Float32, 4, 80, 20),
-                rand(Float32, 4, 20, 80),
-                rand(Float32, 20),
-                rand(Float32, 20, 10)
+                fill(1f0, 10, 20),
+                fill(2f0, 4, 20),
+                fill(3f0, 4, 20),
+                fill(4f0, 4, 20, 20),
+                fill(5f0, 4, 20, 20),
+                fill(6f0, 4, 20, 20),
+                fill(7f0, 20, 20, 4),
+                fill(8f0, 4, 20, 80),
+                fill(9f0, 4, 80, 20),
+                fill(10f0, 4, 20, 80),
+                fill(11f0, 20),
+                fill(12f0, 20, 10),
             )
 
             # Type checks: the struct and a few representative fields.
@@ -42,26 +41,26 @@ using Test
 
             # Missing an argument should throw (constructor arity check).
             @test_throws MethodError Llama2.TransformerWeights(
-                rand(Float32, 10, 20),
-                rand(Float32, 4, 20),
-                rand(Float32, 4, 20),
-                rand(Float32, 4, 20, 20),
-                rand(Float32, 4, 20, 20),
-                rand(Float32, 4, 20, 20),
-                rand(Float32, 20, 20, 4),
-                rand(Float32, 4, 20, 80),
-                rand(Float32, 4, 80, 20),
-                rand(Float32, 4, 20, 80),
-                rand(Float32, 20)
+                fill(1f0, 10, 20),
+                fill(2f0, 4, 20),
+                fill(3f0, 4, 20),
+                fill(4f0, 4, 20, 20),
+                fill(5f0, 4, 20, 20),
+                fill(6f0, 4, 20, 20),
+                fill(7f0, 20, 20, 4),
+                fill(8f0, 4, 20, 80),
+                fill(9f0, 4, 80, 20),
+                fill(10f0, 4, 20, 80),
+                fill(11f0, 20), 
             )
         end
 
         @testset "runstate" begin
             # RunState holds temporary buffers/caches used during decoding.
             r = Llama2.RunState(
-                rand(Float32, 10),
-                rand(Float32, 4, 10, 20),
-                rand(Float32, 4, 10, 20)
+                fill(1f0, 10),
+                fill(2f0, 4, 10, 20),
+                fill(3f0, 4, 10, 20),
             )
 
             # Basic type sanity for fields.
