@@ -7,7 +7,7 @@ You want to understand how this package works or modify the code you are running
 ```@docs
 Llama2.Tokenizer
 Llama2.TokenIndex
-Llama2.compare_tokens
+Llama2.isless_tokens
 Llama2.str_lookup
 Llama2.encode
 ```
@@ -26,4 +26,14 @@ Llama2.RunState
 ```@docs
 Llama2.rmsnorm
 Llama2.softmax!
+```
+
+## Sampler
+
+```@docs
+Llama2.Sampler
+Llama2.ProbIndex
+Llama2.isless_probindex
+Llama2.sample_mult
+Llama2.sample_topp
 ```

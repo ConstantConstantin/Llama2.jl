@@ -40,10 +40,10 @@ It returns `true` if `first_token`'s string is **lexicographically** less than t
 
 # Examples
 ```jldoctest
-julia> Llama2.compare_tokens(Llama2.TokenIndex("A", 1), Llama2.TokenIndex("B", 2))
+julia> Llama2.isless_tokens(Llama2.TokenIndex("A", 1), Llama2.TokenIndex("B", 2))
 true
 
-julia> Llama2.compare_tokens(Llama2.TokenIndex("B", 1), Llama2.TokenIndex("A", 2))
+julia> Llama2.isless_tokens(Llama2.TokenIndex("B", 1), Llama2.TokenIndex("A", 2))
 false
 ```
 """

@@ -17,13 +17,13 @@
             @test ti0.id == Int16(0)
         end
 
-    @testset "compare_tokens" begin
+    @testset "isless_tokens" begin
             # Comparison helper for sorting by string (and/or tie-breaking rules).
-            @test Llama2.compare_tokens(Llama2.TokenIndex("A", 1), Llama2.TokenIndex("B", 2)) == true
-            @test Llama2.compare_tokens(Llama2.TokenIndex("B", 1), Llama2.TokenIndex("A", 2)) == false
+            @test Llama2.isless_tokens(Llama2.TokenIndex("A", 1), Llama2.TokenIndex("B", 2)) == true
+            @test Llama2.isless_tokens(Llama2.TokenIndex("B", 1), Llama2.TokenIndex("A", 2)) == false
 
             # Same string should not be considered "less".
-            @test Llama2.compare_tokens(Llama2.TokenIndex("aa", 1), Llama2.TokenIndex("aa", 2)) == false
+            @test Llama2.isless_tokens(Llama2.TokenIndex("aa", 1), Llama2.TokenIndex("aa", 2)) == false
         end
 
     @testset "Tokenizer" begin

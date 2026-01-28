@@ -6,7 +6,8 @@ Return that text as a `String`.
 Load the model from `modelpath` and the corresponding tokenizer from `vocabpath`
 (which defaults to `"data/tokenizer.bin"`). Take an initial `prompt` `String`
 to start the text generation and generate up to `max_tokens` tokens.
-If `verbose`, print the text during generation.
+If `verbose`, print the text during generation. Set `temperature` and topp
+to configure the `Sampler`.
 
 ```julia
 julia> print(talktollm("/PATH/TO/YOUR/MODEL.bin"))
@@ -22,10 +23,11 @@ They decided to sit down and read the book together. They read about a beautiful
 From that day on, they would sit down and read the book every night before bed. They hoped that when they finished reading it, something magical would happen.
 ```
 """
-function talktollm(modelpath::String, prompt::String = ""; max_tokens::Int=256, vocabpath::String = _vocabpath, verbose::Bool = false)
+function talktollm(modelpath::String, prompt::String = ""; max_tokens::Int=255, vocabpath::String = _vocabpath, verbose::Bool = false, temperature::Float32 = 0.f0, topp::Float32 = 1.1f0)
 
     transformer = Transformer(modelpath)
     tok = Tokenizer(vocabpath, transformer.config.vocab_size)
+    sampler = Sampler(transformer.config.vocab_size, temperature, topp, 1234)
 
     input_tokens = encode(tok, prompt)
 
@@ -49,8 +51,7 @@ function talktollm(modelpath::String, prompt::String = ""; max_tokens::Int=256, 
         if pos < n_input_tokens
             next = input_tokens[pos + 1]
         else
-            softmax!(logits)
-            next = wsample(logits)
+            next = sampler(logits)
         end
 
         next == 2 && break
