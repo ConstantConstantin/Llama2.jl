@@ -1,7 +1,14 @@
 """
-    rmsnorm(x, w)
+    rmsnorm(x, w) -> Vector{Float32}
 
 Calculate the rmsnorm of `x` and `w`, the scaled product 'λw * x'.
+
+# Arguments
+- `x::AbstractVector{Float32}`: Input vector to normalize.
+- `w::AbstractVector{Float32}`: Scale weights (must have same length as `x`).
+
+# Returns
+- `Vector{Float32}`: Normalized and scaled output.
 
 # Examples
 ```jldoctest
@@ -32,8 +39,20 @@ end
 
 
 """
-softmax(x)
-Updates the Output of an Layer 'x' with the softmax of the input.
+    softmax!(x) -> Vector{Float32}
+Updates the output of an layer 'x' with the softmax of the input.
+
+Transform logits into a probability distribution by exponentiating and
+normalizing. Uses the numerically stable formulation:
+`x[i] = exp(x[i] - max(x)) / sum(exp(x .- max(x)))`.
+
+The input vector is modified in-place and also returned.
+
+# Arguments
+- `x::AbstractVector{Float32}`: Logits to transform (modified in-place).
+
+# Returns
+- `Vector{Float32}`: The same vector `x`, now containing probabilities that sum to 1.
 
 # Examples
 ```jldoctest
@@ -63,6 +82,33 @@ function softmax(x::AbstractVector{Float32})
     return x
 end
 
+"""
+    forward!(transformer::Transformer, token::Int32, pos::Int32) 
+
+Perform a single forward pass through the transformer.
+
+Compute logits for the next token prediction given the current `token` at
+position `pos` in the sequence. Updates the internal KV-cache in `transformer.state`
+with keys and values from this forward pass.
+
+# Arguments
+- `transformer::Transformer`: The model (modified in-place via KV-cache updates).
+- `token::Int32`: Current input token index (must be in range `1:vocab_size`).
+- `pos::Int32`: Position in the sequence (1-indexed, must be ≤ `seq_len`).
+
+# Returns
+- `Vector{Float32}`: Logits over the vocabulary for next token prediction (length = `vocab_size`).
+
+# Examples
+```julia
+model = Transformer("model.bin")
+token = Int32(1)  # BOS token
+pos = Int32(1)
+
+logits = forward!(model, token, pos)
+next_token = argmax(logits)
+```
+"""
 function forward(transformer::Transformer, token::Int32, pos::Int32)
 
     config = transformer.config

@@ -1,11 +1,16 @@
 """
     TokenIndex(str::String, id::Integer)
 
-Create a `TokenIndex` from `str` and the identifier `id`.
+A vocabulary token with its string representation and numeric identifier.
 
-The byte sequence is converted to `String` and the ID is
-converted to `Int16`.  
+Stores a token string and its associated ID for efficient sorting and lookup
+in the tokenizer vocabulary.
+
 Throw a `DomainError` if `id ≤ 0`.
+
+# Arguments
+- `str::String`: Token string (e.g., "Julia").
+- `id::Integer`: Token identifier (converted to `Int16`, must be ≥ 0).
 
 # Examples
 ```jldoctest
@@ -35,8 +40,10 @@ end
 """
     Base.isless(first_token::TokenIndex, second_token::TokenIndex) -> Bool
 
-Compare two `first_token` and `scond_token` by their string values.
-It returns `true` if `first_token`'s string is **lexicographically** less than the second's, and `false` otherwise.
+Compare two tokens lexicographically by their string values.
+
+Return `true` if `first_token.str < second_token.str` in lexicographic order.
+Intended for use as the `lt` argument to sorting functions.
 
 # Examples
 ```jldoctest
@@ -69,6 +76,26 @@ Construct a tokenizer storing vocabulary entries, scores, and byte-piece mapping
 - `vocab_size`: Number of vocabulary entries.  
 - `max_token_length`: Maximum token length in bytes.  
 - `byte_pieces`: Byte mapping (length 256).
+
+---
+    Tokenizer(path::String, vocab_size::Integer) -> Tokenizer
+
+Load a tokenizer from a binary file.
+
+Read vocabulary, token scores, and metadata from the binary file at `path`.
+The file format expects:
+- Int32: maximum token length
+- For each of `vocab_size` tokens:
+  - Float32: token score
+  - Int32: string length (n)
+  - n bytes: token string (UTF-8)
+
+# Arguments
+- `path::String`: Path to the tokenizer binary file.
+- `vocab_size::Integer`: Expected number of vocabulary entries.
+
+# Returns
+- `Tokenizer`: A tokenizer ready for encoding/decoding text.
 """
 struct Tokenizer
 
@@ -127,6 +154,13 @@ Search for `str` within a sorted vocabulary `sorted_vocab`.
 If a match is found, it returns the corresponding token ID;
 **otherwise, it returns `-1`.** It uses a binary search for efficient lookup.
 
+# Arguments
+- `str::String`: Token string to search for.
+- `sorted_vocab::Vector{TokenIndex}`: Vocabulary sorted lexicographically by string.
+
+# Returns
+- `Int16`: Token ID if found, `-1` otherwise.
+
 # Examples
 ```jldoctest
 julia> Llama2.str_lookup("aa", [Llama2.TokenIndex("aa", 1), Llama2.TokenIndex("bb", 2)])
@@ -148,12 +182,20 @@ function str_lookup(str::String, sorted_vocab::Vector{TokenIndex})::Int16
 end
 
 """
-    encode(tokenizer::Tokenizer, text::String)
+    encode(tokenizer::Tokenizer, text::String) -> Vector{Integer}
 
 Converts `text` into a sequence of token IDs using `tokenizer`.
 First ensure the tokenizer's vocabulary is sorted, then encode each character into its corresponding ID.
 After that, iteratively merge token pairs with the highest scores to form longer tokens until no more merges are possible.
 Return the final token ID sequence.
+
+# Arguments
+- `tokenizer::Tokenizer`: The tokenizer with vocabulary and merge scores.
+- `text::String`: Input text to encode.
+
+# Returns
+- `Vector{Integer}`: Sequence of token IDs representing the encoded text.
+
 """
 function encode(tokenizer::Tokenizer, text::String)
 

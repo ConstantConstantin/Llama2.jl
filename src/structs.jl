@@ -55,20 +55,20 @@ struct RunState
     value_cache::Array{Float32, 3}
 end
 
-struct Transformer
-    config::Config
-    weights::TransformerWeights
-    state::RunState
-    # omitting the fd/file size info for now because the content already should be stored into the fields of config and weights
-
-    """
+"""
     Transformer(config::Config, weights::TransformerWeights)
 
 Create a `Transformer` with data from `config` and `weights`. The `RunState` containers are initialized empty and just are assigned the corresponding dimensions.
 
 # Developer Notes
 This is an internal struct.
-     """
+"""
+struct Transformer
+    config::Config
+    weights::TransformerWeights
+    state::RunState
+    # omitting the fd/file size info for now because the content already should be stored into the fields of config and weights
+
     function Transformer(config::Config, weights::TransformerWeights)
         kv_dim = div((config.dim * config.n_kv_heads), config.n_heads)
         key_cache = Array{Float32, 3}(undef, config.n_layers, config.seq_len, kv_dim)

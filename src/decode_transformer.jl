@@ -4,6 +4,12 @@
 Load a binary file with location `path` and construct a `Transformer` from its content.
 The file is expected to have a header of 7 Int32 values followed by Float32 data.
 
+# Arguments
+- `path::String`: Path to the binary model file.
+
+# Returns
+- `Transformer`: A transformer model ready for inference.
+
 # Example
 ```
 julia> t = Llama2.Transformer("/PATH/TO/YOUR.bin");

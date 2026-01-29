@@ -1,5 +1,5 @@
 """
-    talktollm(modelpath::String, [prompt::String]; max_tokens::Int, vocabpath::String, verbose::Bool)
+    talktollm(modelpath::String, [prompt::String]; max_tokens::Int, vocabpath::String, verbose::Bool) -> String
 
 Generate text using a pretrained LLama2 transformer model.
 Return that text as a `String`.
@@ -8,6 +8,20 @@ Load the model from `modelpath` and the corresponding tokenizer from `vocabpath`
 to start the text generation and generate up to `max_tokens` tokens.
 If `verbose`, print the text during generation. Set `temperature` and topp
 to configure the `Sampler`.
+
+# Arguments
+- `modelpath::String`: Path to the binary model file (e.g., "stories15M.bin").
+- `prompt::String`: Initial text to condition generation (default: empty, starts with BOS token).
+
+# Keyword Arguments
+- `max_tokens::Int=255`: Maximum number of tokens to generate.
+- `vocabpath::String`: Path to tokenizer binary (default: "data/tokenizer.bin").
+- `verbose::Bool=false`: If `true`, print tokens as they are generated.
+- `temperature::Float32=0.0f0`: Sampling temperature (0 = greedy, higher = more random).
+- `topp::Float32=1.1f0`: Nucleus sampling threshold (≤0 or ≥1 disables nucleus sampling).
+
+# Returns
+- `String`: The generated text.
 
 ```julia
 julia> print(talktollm("/PATH/TO/YOUR/MODEL.bin"))

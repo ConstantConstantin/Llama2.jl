@@ -138,7 +138,7 @@ random number.
 - `topp::Float32`: Cumulative probability threshold (`0 < topp < 1`).
 - `probindex::Vector{ProbIndex}`: Preallocated workspace for sorting and
   indexing candidate tokens.
-- `coin::Float64`: Uniform random number in `[0, 1)`.
+- `coin::Float32`: Uniform random number in `[0, 1)`.
 
 # Returns
 - Index of the sampled token.
