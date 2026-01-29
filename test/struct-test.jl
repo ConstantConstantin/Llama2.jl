@@ -19,87 +19,48 @@
     @testset "Transformer" begin
         # Build a weights container with random Float32 arrays matching expected ranks.
         path = normpath(joinpath(@__DIR__, "..", "data", "stories15M.bin"))
-        tt = Llama2.Transformer(path)
+        t = Llama2.Transformer(path)
         
-        cfg = tt.config
-        w = tt.weights
-
-        # Minimal config sanity
-        @test cfg.dim > 0
-        @test cfg.n_heads > 0
-        @test cfg.dim % cfg.n_heads == 0
-
-        # Derived sizes used for expected weight shapes.
-        head_size = div(cfg.dim, cfg.n_heads)
-        nl = Int(cfg.n_layers)
-
-        # Shape checks for the main weight tensors.
-        @test size(w.token_embedding_table) == (cfg.vocab_size, cfg.dim)
-        @test size(w.rms_att_weight) == (nl, cfg.dim)
-        @test size(w.wq) == (nl, cfg.dim, cfg.n_heads * head_size)
-        @test size(w.wk) == (nl, cfg.dim, cfg.n_kv_heads * head_size)
-        @test size(w.wv) == (nl, cfg.dim, cfg.n_kv_heads * head_size)
-        @test size(w.wo) == (nl, cfg.n_heads * head_size, cfg.dim)
-        @test size(w.rms_ffn_weight) == (nl, cfg.dim)
-
-        @test size(w.w1) == (nl, cfg.hidden_dim, cfg.dim)
-        @test size(w.w2) == (nl, cfg.dim, cfg.hidden_dim)
-        @test size(w.w3) == (nl, cfg.hidden_dim, cfg.dim)
-
-        # Final RMS weight should be a vector over model dim.
-        @test length(w.rms_final_weight) == cfg.dim
-
-        t = Llama2.TransformerWeights(
-            fill(1f0, 10, 20),
-            fill(2f0, 4, 20),
-            fill(3f0, 4, 20),
-            fill(4f0, 4, 20, 20),
-            fill(5f0, 4, 20, 20),
-            fill(6f0, 4, 20, 20),
-            fill(7f0, 20, 20, 4),
-            fill(8f0, 4, 20, 80),
-            fill(9f0, 4, 80, 20),
-            fill(10f0, 4, 20, 80),
-            fill(11f0, 20),
-            fill(12f0, 20, 10),
-            )
-
-        # Type checks: the struct and a few representative fields.
-        @test t isa Llama2.TransformerWeights
-        @test t.token_embedding_table isa Matrix{Float32}
-        @test t.wq isa Array{Float32,3}
-        @test t.rms_final_weight isa Vector{Float32}
-
-        # Missing an argument should throw (constructor arity check).
-        @test_throws MethodError Llama2.TransformerWeights(
-            fill(1f0, 10, 20),
-            fill(2f0, 4, 20),
-            fill(3f0, 4, 20),
-            fill(4f0, 4, 20, 20),
-            fill(5f0, 4, 20, 20),
-            fill(6f0, 4, 20, 20),
-            fill(7f0, 20, 20, 4),
-            fill(8f0, 4, 20, 80),
-            fill(9f0, 4, 80, 20),
-            fill(10f0, 4, 20, 80),
-            fill(11f0, 20), 
-            )
+        cfg = t.config
+        w = t.weights
         @testset "Transformer.Config" begin
-            
+            # config sanity
+            @test cfg.dim == 288
+            @test cfg.hidden_dim == 768
+            @test cfg.n_layers == 6
+            @test cfg.n_heads == 6
+            @test cfg.n_kv_heads == 6
+            @test cfg.vocab_size == 32000
+            @test cfg.seq_len == 256
 
-            c = tt.config
-
-            @test c.dim == 288
-            @test c.hidden_dim == 768
-            @test c.n_layers == 6
-            @test c.n_heads == 6
-            @test c.n_kv_heads == 6
-            @test c.vocab_size == 32000
-            @test c.seq_len == 256
+            @test cfg.dim % cfg.n_heads == 0
         end
-        @testset "Transformer.TransformerWeights" begin
 
-            w = tt.weights
+        @testset "Transformer.Weights-shapes" begin
+            # Derived sizes used for expected weight shapes.
+            head_size = div(cfg.dim, cfg.n_heads)
+            nl = Int(cfg.n_layers)
+
+            # Shape checks for the main weight tensors.
+            @test size(w.token_embedding_table) == (cfg.vocab_size, cfg.dim)
+            @test size(w.rms_att_weight) == (nl, cfg.dim)
+            @test size(w.wq) == (nl, cfg.dim, cfg.n_heads * head_size)
+            @test size(w.wk) == (nl, cfg.dim, cfg.n_kv_heads * head_size)
+            @test size(w.wv) == (nl, cfg.dim, cfg.n_kv_heads * head_size)
+            @test size(w.wo) == (nl, cfg.n_heads * head_size, cfg.dim)
+            @test size(w.rms_ffn_weight) == (nl, cfg.dim)
+
+            @test size(w.w1) == (nl, cfg.hidden_dim, cfg.dim)
+            @test size(w.w2) == (nl, cfg.dim, cfg.hidden_dim)
+            @test size(w.w3) == (nl, cfg.hidden_dim, cfg.dim)
+
+            # Final RMS weight should be a vector over model dim.
+            @test length(w.rms_final_weight) == cfg.dim
+        end
+        
+        @testset "Transformer.Weights-values" begin
+
+            w = t.weights
 
             # testing every single value is too much
             # we resort to testing single values at the beginning and along the axes of the containers

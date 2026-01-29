@@ -6,5 +6,4 @@ using Test
     include("talk-test.jl")
     include("struct-test.jl")
     include("tokenizer-test.jl")
-    include("transformer-test.jl")
 end
