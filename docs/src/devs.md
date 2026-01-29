@@ -24,6 +24,7 @@ Llama2.RunState
 ## forward
 
 ```@docs
+Llama2.forward
 Llama2.rmsnorm
 Llama2.softmax
 ```
