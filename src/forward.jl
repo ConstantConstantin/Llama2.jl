@@ -116,9 +116,9 @@ function forward!(transformer::Transformer, token::Int32, pos::Int32)
         for h in 1:config.n_heads # multi-head attention
 
             q_head = @view q[((h - 1) * head_size + 1):(h  * head_size)]
-            att = Vector{Float32}(undef, pos + 1)
+            att = Vector{Float32}(undef, pos)
 
-            for t in 1:(pos + 1)
+            for t in 1:pos
 
                 k = state.key_cache[l, t, (div(h - 1, kv_mul) * head_size + 1):((div(h - 1, kv_mul) + 1) * head_size)]
 
@@ -130,7 +130,7 @@ function forward!(transformer::Transformer, token::Int32, pos::Int32)
 
             xb_head = @view xb[((h - 1) * head_size + 1):(h * head_size)]
 
-            for t in 1:(pos + 1)
+            for t in 1:pos
 
                 v = state.value_cache[l, t, (div(h - 1, kv_mul) * head_size + 1):((div(h - 1, kv_mul) + 1) * head_size)]
                 
