@@ -1,70 +1,97 @@
-_vocabpath = normpath(joinpath(@__DIR__, "..", "data", "tokenizer.bin"))
+const _vocabpath = normpath(joinpath(@__DIR__, "..", "data", "tokenizer.bin"))
 
 """
-    talktollm(modelpath::String, [prompt::String]; max_tokens::Int, vocabpath::String, verbose::Bool)
+    LlamaChat
 
-Generate text using a pretrained LLama2 transformer model.
-Return that text as a `String`.
-Load the model from `modelpath` and the corresponding tokenizer from `vocabpath`
-(which defaults to `"data/tokenizer.bin"`). Take an initial `prompt` `String`
-to start the text generation and generate up to `max_tokens` tokens.
-If `verbose`, print the text during generation.
+A stateful chat session with a Llama2 model that accumulates conversation history.
 
+# Fields
+- `transformer::Transformer`: The loaded transformer model
+- `tokenizer::Tokenizer`: The tokenizer for encoding/decoding
+- `history::String`: Accumulated conversation history
+- `pos::Int`: Current token position in the sequence
+- `last_token::Int32`: Last generated token (for continuing generation)
+"""
+mutable struct LlamaChat
+    transformer::Transformer
+    tokenizer::Tokenizer
+    history::String
+    pos::Int
+    last_token::Int32
+end
+
+"""
+    LlamaChat(modelpath::String; vocabpath::String)
+
+Initialize a new chat session with a Llama2 model.
+
+# Examples
 ```julia
-julia> print(talktollm("/PATH/TO/YOUR/MODEL.bin"))
- Once upon a time, there was a little girl named Lily. She loved to play outside in the park with her friends. One day, Lily was running and she fell and hit her head on a rock. She got a big ouchie and it started to bleed. 
-Lily's mom took her to the doctor and the doctor said she needed a stitch. Lily was scared, but her mom was very dependable and told her they would be coming back home soon. 
-After the doctor fixed Lily's knee, they went home and Lily's friends came to play again. But Lily's mom noticed that she was playing with a ball and some new toys. This made her very happy.
-
-julia> print(talktollm("/PATH/TO/YOUR/MODEL.bin", "\"What is this?\""))
-"What is this?" the woman asked.
-The little girl looked at the bookion and said, "This is a book about a princess. Maybe we can use it together."
-They decided to sit down and read the book together. They read about a beautiful garden with lovely flowers. The little girl loved the book very much and said, "I want to be a princess again!"
-"Maybe, if you read me another book," the woman said.
-From that day on, they would sit down and read the book every night before bed. They hoped that when they finished reading it, something magical would happen.
+chat = LlamaChat("/path/to/model.bin")
 ```
 """
-function talktollm(modelpath::String, prompt::String = ""; max_tokens::Int=255, vocabpath::String = _vocabpath, verbose::Bool = false)
-
+function LlamaChat(modelpath::String; vocabpath::String = _vocabpath)
     transformer = Transformer(modelpath)
-    tok = Tokenizer(vocabpath, transformer.config.vocab_size)
+    tokenizer = Tokenizer(vocabpath, transformer.config.vocab_size)
+    return LlamaChat(transformer, tokenizer, "", 0, Int32(0))
+end
 
-    input_tokens = encode(tok, prompt)
+"""
+    talk!(chat::LlamaChat, prompt::String; max_tokens::Int=255, verbose::Bool=true)
 
-    result = Vector{Int32}()
-    sizehint!(result, max_tokens)
+Continue conversation with an existing chat session. The prompt is appended to
+the conversation history and generation continues from the current position.
 
+# Examples
+```julia
+chat = LlamaChat("/path/to/model.bin")
+talk!(chat, "Hello, who are you?")
+talk!(chat, " Tell me more")  # Continues with context
+```
+"""
+function talk!(chat::LlamaChat, prompt::String; max_tokens::Int=255, verbose::Bool=true)
+    chat.history *= prompt
+    
+    input_tokens = encode(chat.tokenizer, chat.history)
+    
     if isempty(input_tokens)
-        input_tokens = [2] # default for empty prompt
-    else
-        push!(result, input_tokens[1])
-        verbose &&  print(tok.vocab[input_tokens[1]])
+        input_tokens = [Int32(2)]  
     end
-
-    token = input_tokens[1]
+    
     n_input_tokens = length(input_tokens)
-
-    for pos in 1:max_tokens
-
-        logits = forward!(transformer, Int32(token), Int32(pos))
-
+    start_pos = chat.pos == 0 ? 1 : chat.pos + 1
+    
+    token = start_pos <= n_input_tokens ? input_tokens[start_pos] : chat.last_token
+    
+    result = String[]
+    
+    for pos in start_pos:(start_pos + max_tokens - 1)
+        logits = forward!(chat.transformer, Int32(token), Int32(pos))
+        
         if pos < n_input_tokens
             next = input_tokens[pos + 1]
         else
             softmax!(logits)
             next = wsample(logits)
         end
-
-        next == 2 && break
-
-        push!(result, next)
-        verbose && print(tok.vocab[next])
-
-        token = next
         
+        next == 2 && break
+        
+        if pos >= n_input_tokens
+            token_str = chat.tokenizer.vocab[next]
+            verbose && print(token_str)
+            push!(result, token_str)
+        end
+        
+        chat.pos = pos
+        chat.last_token = Int32(next)
+        token = next
     end
-
-    verbose && println()
     
-    return string(broadcast(x -> tok.vocab[x], result)...)
+    generated = join(result)
+    chat.history *= generated
+    
+    verbose && println()
+    return generated
 end
+

@@ -3,7 +3,7 @@ module Llama2
 using StatsBase: wsample
 using LinearAlgebra: dot
 
-export talktollm
+export talktollm, LlamaChat, talk!, reset!
 
 include("structs.jl")
 include("tokenizer.jl")
