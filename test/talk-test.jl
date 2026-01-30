@@ -30,16 +30,13 @@
 
         d = chatwithllm(c; max_tokens=62)
         e = chatwithllm(c, " a secret path"; max_tokens=62)
-        #h = chatwithllm(c, " and had the best day "; temperature=1.1f0, topp=0.5f0)
 
 
         @test d isa String
         @test e isa String
-        #@test h isa String
 
         @test d == " Once upon a time, there was a little bird who loved singing. She flew everywhere in the forest, and sometimes even made up her own song for the other birds to sing along. One day, she met a little girl who was lost and couldn't find her way home. The little bird showed her"
         @test e == " a secret path that led the way to her home.\nThe little girl was grateful and thanked the bird. But as she started to leave, the little bird became selfish and scurried away. The little girl was sad and realized that she should have listened to the bird's advice and left the little"
-        #@test h == " and had the best day  evening.\nThe moral of the story is that it's important to listen to those who care about us and be ready to show our own creativity. It's important to make new friends and find comfort in the times we lose the world around us."
 
         f = ChatBot(p)
 
