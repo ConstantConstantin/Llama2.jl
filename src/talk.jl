@@ -81,17 +81,17 @@ If `verbose`, print the text during generation.
 ```julia
 julia> c = ChatBot("data/stories15M.bin");
 
-julia> print(chatwithllm(c))
+julia> print(chatwithllm(c); max_tokens = 63)
  Once upon a time, there was an old house with an ancient sign inside. The sign was very big and had many words on it. One day, a little girl went to visit the old house. She wanted to see what was inside.
 The old house said, "Hello? Can I come in?"
 
-julia> print(chatwithllm(c, "\nThe little girl said:"))
+julia> print(chatwithllm(c, "\nThe little girl said:"; max_tokens = 63))
 
 The little girl said: "Yes please! Can I come in too?"
 The old house thought for moments before it said, "Yes. This light is available for you 30 cent a nightmare."
 The little girl was very excited. She said thank you and then, followed her favorite sign
 
-julia> print(chatwithllm(c, "until"))
+julia> print(chatwithllm(c, "until"; max_tokens = 63))
 until she saw there was a beautiful light online.
 When the old house passed, the girl happily went inside. It was very old, but it had been there for a long time. The old house was very special, and she thought the light was the prettiest thing ever.
 ```
