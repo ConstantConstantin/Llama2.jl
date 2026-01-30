@@ -51,17 +51,17 @@
 
         #added tolerances for floating point comparisons this should be revisted maybe later
         @test length(l) == 32000
-        @test isapprox(l[1], -6.727445f0; rtol=1e-2, atol=1e-5)
-        @test isapprox(l[2], 0.8421467f0; rtol=1e-2, atol=1e-5)
-        @test isapprox(l[32000], -6.7272153f0; rtol=1e-2, atol=1e-5)
+        @test l[1] == -6.7907844f0
+        @test l[2] == 0.82811666f0
+        @test l[32000] == -6.7905493f0
 
-        @test isapprox(t.state.key_cache[1, 1, 1], 0.009520381f0; rtol=1e-2, atol=1e-5)
-        @test isapprox(t.state.key_cache[6, 1, 1], 0.13823175f0; rtol=1e-2, atol=1e-5)
-        @test isapprox(t.state.key_cache[1, 1, 69], -2.0702043f0; rtol=1e-2, atol=1e-5)
+        @test t.state.key_cache[1, 1, 1] == 0.009520381f0
+        @test t.state.key_cache[6, 1, 1] == 0.14873701f0
+        @test t.state.key_cache[1, 1, 69] == -2.0702043f0
 
-        @test isapprox(t.state.value_cache[1, 1, 1], -0.013249561f0; rtol=1e-2, atol=1e-5)
-        @test isapprox(t.state.value_cache[6, 1, 1], -0.031174064f0; rtol=1e-2, atol=1e-5)
-        @test isapprox(t.state.value_cache[1, 1, 69], -0.09122322f0; rtol=1e-2, atol=1e-5)
+        @test t.state.value_cache[1, 1, 1] == -0.013249561f0
+        @test t.state.value_cache[6, 1, 1] == -0.039186154f0
+        @test t.state.value_cache[1, 1, 69] == -0.09122322f0
 
     end
 
