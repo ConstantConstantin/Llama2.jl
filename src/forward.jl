@@ -120,7 +120,7 @@ function forward!(transformer::Transformer, token::Int32, pos::Int32)
 
             for t in 1:pos
 
-                k = state.key_cache[l, t, (div(h - 1, kv_mul) * head_size + 1):((div(h - 1, kv_mul) + 1) * head_size)]
+                k = @view state.key_cache[l, t, (div(h - 1, kv_mul) * head_size + 1):((div(h - 1, kv_mul) + 1) * head_size)]
 
                 att[t] = dot(q_head, k)/sqrt(head_size)
 
@@ -132,7 +132,7 @@ function forward!(transformer::Transformer, token::Int32, pos::Int32)
 
             for t in 1:pos
 
-                v = state.value_cache[l, t, (div(h - 1, kv_mul) * head_size + 1):((div(h - 1, kv_mul) + 1) * head_size)]
+                v = @view state.value_cache[l, t, (div(h - 1, kv_mul) * head_size + 1):((div(h - 1, kv_mul) + 1) * head_size)]
                 
                 xb_head .+= att[t] * v
 
