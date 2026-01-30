@@ -115,12 +115,10 @@ function chatwithllm(bot::ChatBot, prompt::String = ""; max_tokens::Int = 255, v
 
     token = input_tokens[1]
     n_input_tokens = length(input_tokens)
-    end_str = ""
 
     for pos in bot.pos:(bot.pos + max_tokens - 1)
         if pos >= transformer.config.seq_len - 1
-            empty!(result)
-            end_str = "YOUR CHAT REACHED MAXIMUM SEQUENCE LENGTH!"
+            @info "YOUR CHAT REACHED MAXIMUM SEQUENCE LENGTH!"
             break
         end
         logits = forward!(transformer, Int32(token), Int32(pos))
@@ -148,5 +146,5 @@ function chatwithllm(bot::ChatBot, prompt::String = ""; max_tokens::Int = 255, v
 
     verbose && println()
     
-    return string(broadcast(x -> tok.vocab[x], result)..., end_str)
+    return string(broadcast(x -> tok.vocab[x], result)...)
 end

@@ -40,7 +40,18 @@
 
         @test g isa String
 
-        @test g == " Anna liked to play with her toy house. She would pretend to be a mommy and a daddy, and she would dress up nails with her toys. She had a lot of fun with her toy house.\nOne day, Anna was playing with her toy house when she saw a small bird outside her window. The bird was chirping and cheerful, almost like a magic show. Anna wanted to see the bird closer, so she opened the window and climbed out.\nBut as soon as she went outside, the window started to crack. Anna strangely realized she was trapped inside. She tried to reach and push, but it was too fragile and hurt her hand. She screamed for help, but nobody saw her.\nSuddenly, the window broke and Anna was trapped inside. It was dark and scary. She hoped that everyone would hear her and come to help her. But no one did. Anna realized that pretending was not enough. She wished that she had a friend to help her. But nobody came. Anna was trapped in the room with no one to talk to. And sometimes, pretending is all that way.YOUR CHAT REACHED MAXIMUM SEQUENCE LENGTH!"
+        @test g == " Anna liked to play with her toy house. She would pretend to be a mommy and a daddy, and she would dress up nails with her toys. She had a lot of fun with her toy house.\nOne day, Anna was playing with her toy house when she saw a small bird outside her window. The bird was chirping and cheerful, almost like a magic show. Anna wanted to see the bird closer, so she opened the window and climbed out.\nBut as soon as she went outside, the window started to crack. Anna strangely realized she was trapped inside. She tried to reach and push, but it was too fragile and hurt her hand. She screamed for help, but nobody saw her.\nSuddenly, the window broke and Anna was trapped inside. It was dark and scary. She hoped that everyone would hear her and come to help her. But no one did. Anna realized that pretending was not enough. She wished that she had a friend to help her. But nobody came. Anna was trapped in the room with no one to talk to. And sometimes, pretending is all that way."
+
+        seed!(111134)
+        
+        f = ChatBot(p)
+
+        g = chatwithllm(f; max_tokens=300)
+
+        @test g isa String
+
+        @test g == " Once upon a time, there was a little girl named Lily. She loved to play with her toys and explore her house. One day, Lily's mom asked her to clean up her toys, but Lily didn't want to. She wanted to go to explore some more.\nLily's mom said, \"If you can organize your toys, you will find your favorite doll.\" Lily sighed and started to put her toys away. She discovered her doll under her bed and then started to put her other toys away.\nAs Lily was organizing her toys, she found a journal that her mom had given her. She didn't know what was inside, but it looked important. Lily decided to keep it under her bed a little longer.\nLater that day, Lily's mom came into her room and asked her how she was organizing her toys. Lily proudly showed her mom the journal and told her all about her adventure. Her mom was happy to hear about it and suggested they make a special treasure out of Lys that they didn't need anymore.\nLily was excited and they went to the toy store and"
+        
     end
 
 end
