@@ -35,7 +35,7 @@ julia> using Llama2
 ```
 
 ## Example Usage
-For using Interference, a 
+
 There are two main functions for chatting in this package: `talktollm` and `chatwithllm`. `talktollm` is intended for out-of-the-box use and demonstrates the core functionality of the package. It requires only a model as input, with optional arguments such as text input, temperature, or maximum token length. Using `talktollm`, you can generate only a single prompt.
 
 ```julia
