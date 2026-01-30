@@ -25,8 +25,8 @@
 
         c = ChatBot(p)
 
-        d = chatwithllm(c; max_tokens=63)
-        e = chatwithllm(c, " a secret path"; max_tokens=63)
+        d = chatwithllm(c; max_tokens=62)
+        e = chatwithllm(c, " a secret path"; max_tokens=62)
 
         @test d isa String
         @test e isa String
@@ -50,7 +50,7 @@
 
         @test g isa String
 
-        @test g == " Once upon a time, there was a little girl named Lily. She loved to play with her toys and explore her house. One day, Lily's mom asked her to clean up her toys, but Lily didn't want to. She wanted to go to explore some more.\nLily's mom said, \"If you can organize your toys, you will find your favorite doll.\" Lily sighed and started to put her toys away. She discovered her doll under her bed and then started to put her other toys away.\nAs Lily was organizing her toys, she found a journal that her mom had given her. She didn't know what was inside, but it looked important. Lily decided to keep it under her bed a little longer.\nLater that day, Lily's mom came into her room and asked her how she was organizing her toys. Lily proudly showed her mom the journal and told her all about her adventure. Her mom was happy to hear about it and suggested they make a special treasure out of Lys that they didn't need anymore.\nLily was excited and they went to the toy store and"
+        @test g == " Once upon a time, there was a little girl named Lily. She loved to play with her toys and explore her house. One day, Lily's mom asked her to clean up her toys, but Lily didn't want to. She wanted to go to explore some more.\nLily's mom said, \"If you can organize your toys, you will find your favorite doll.\" Lily sighed and started to put her toys away. She discovered her doll under her bed and then started to put her other toys away.\nAs Lily was organizing her toys, she found a journal that her mom had given her. She didn't know what was inside, but it looked important. Lily decided to keep it under her bed a little longer.\nLater that day, Lily's mom came into her room and asked her how she was organizing her toys. Lily proudly showed her mom the journal and told her all about her adventure. Her mom was happy to hear about it and suggested they make a special treasure out of Lys that they didn't need anymore.\nLily was excited and they went to the toy store and bought"
         
     end
 
