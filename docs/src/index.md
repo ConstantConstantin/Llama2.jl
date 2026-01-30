@@ -65,7 +65,7 @@ The old house thought for moments before it said, "Yes. This light is available 
 The little girl was very excited. She said thank you and then, followed her favorite sign
 ```
 
-The provided example model is a storyteller capable of generating a random story or continuing a story initiated by the user. More Models can be found 
+The provided example model is a storyteller capable of generating a random story or continuing a story initiated by the user. 
 
 ## API
 
