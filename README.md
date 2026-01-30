@@ -5,7 +5,7 @@
 [![Build Status](https://github.com/ConstantConstantin/Llama2.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/ConstantConstantin/Llama2.jl/actions/workflows/CI.yml?query=branch%3Amain)
 [![Coverage](https://codecov.io/gh/ConstantConstantin/Llama2.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/ConstantConstantin/Llama2.jl)
 
-Welcome to LLama2.jl, a `julia` package that is dedicated to porting the LLama2 experience from `C`. It is  designed to generate output based on a pre-trained model.
+Welcome to Llama2.jl, a `julia` package that is dedicated to porting the Llama2 experience from `C`. It is  designed to generate output based on a pre-trained model.
 
 ## Installation
 
@@ -18,6 +18,8 @@ julia> using Llama2
 ```
 
 ## Example usage
+
+An example 7-billion-parameter Llama 2 model trained as a storyteller is provided in the `data` folder.
 
 ```julia
 julia> print(talktollm("/PATH/TO/YOUR/MODEL.bin"))

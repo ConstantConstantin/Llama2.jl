@@ -6,13 +6,13 @@ CurrentModule = Llama2
 
 ## What is Llama2?
 
-LLaMA 2 is a family of pre-trained large language models (LLMs) developed by Meta AI. It includes a range of model sizes, from 7 to 70 billion parameters. LLaMA 2 models use a classical Transformer architecture with slight variations, most notably the use of RMSNorm instead of standard layer normalization, and the SiLU (Sigmoid Linear Unit) activation function rather than ReLU.
+Llama 2 is a family of pre-trained large language models (LLMs) developed by Meta AI. It includes a range of model sizes, from 7 to 70 billion parameters. Llama 2 models use a classical Transformer architecture with slight variations, most notably the use of RMSNorm instead of standard layer normalization, and the SiLU (Sigmoid Linear Unit) activation function rather than ReLU.
 
 It was released in June 2023. More information can be found at: https://www.llama.com/llama2/
 
 ## What is Llama2.jl?
 
-[Llama2.jl](https://github.com/ConstantConstantin/Llama2.jl) can perform inference on any given LLaMA 2 model from within `julia`. Inference refers to the use of a trained model for tasks such as chatting. It involves mapping user inputs to a predefined vocabulary through encoding and decoding functions, using the model’s weights and architecture to generate outputs, and sampling those outputs to construct a prompt in a desired manner. It includes a continuous chat function that keeps past inputs in a struct, making ongoing conversations possible.
+[Llama2.jl](https://github.com/ConstantConstantin/Llama2.jl) can perform inference on any given Llama 2 model from within `julia`. Inference refers to the use of a trained model for tasks such as chatting. It involves mapping user inputs to a predefined vocabulary through encoding and decoding functions, using the model’s weights and architecture to generate outputs, and sampling those outputs to construct a prompt in a desired manner. It includes a continuous chat function that keeps past inputs in a struct, making ongoing conversations possible.
 
 Its core functionality is written entirely in Julia, with very minimal reliance on other Julia packages.
 
@@ -65,7 +65,9 @@ The old house thought for moments before it said, "Yes. This light is available 
 The little girl was very excited. She said thank you and then, followed her favorite sign
 ```
 
-The provided Examplemodel is a Storyteller, it can Tell a random Story or continue a Story you beging to tell. 
+The provided example model is a storyteller capable of generating a random story or continuing a story initiated by the user. More Models can be found 
+
+## API
 
 ```@index
 ```
