@@ -22,7 +22,7 @@ They decided to sit down and read the book together. They read about a beautiful
 From that day on, they would sit down and read the book every night before bed. They hoped that when they finished reading it, something magical would happen.
 ```
 """
-function talktollm(modelpath::String, prompt::String = ""; max_tokens::Int=255, vocabpath::String = _vocabpath, verbose::Bool = false)
+function talktollm(modelpath::String, prompt::String = ""; max_tokens::Int=256, vocabpath::String = _vocabpath, verbose::Bool = false)
 
     transformer = Transformer(modelpath)
     tok = Tokenizer(vocabpath, transformer.config.vocab_size)
@@ -96,7 +96,7 @@ until she saw there was a beautiful light online.
 When the old house passed, the girl happily went inside. It was very old, but it had been there for a long time. The old house was very special, and she thought the light was the prettiest thing ever.
 ```
 """
-function chatwithllm(bot::ChatBot, prompt::String = ""; max_tokens::Int = 255, verbose::Bool = false)
+function chatwithllm(bot::ChatBot, prompt::String = ""; max_tokens::Int = 256, verbose::Bool = false)
 
     transformer = bot.transformer
     tok = bot.tokenizer
@@ -116,8 +116,9 @@ function chatwithllm(bot::ChatBot, prompt::String = ""; max_tokens::Int = 255, v
     token = input_tokens[1]
     n_input_tokens = length(input_tokens)
 
-    for pos in bot.pos:(bot.pos + max_tokens - 1)
-        if pos >= transformer.config.seq_len - 1
+    for pos in bot.pos:(bot.pos + max_tokens)
+        if pos >= transformer.config.seq_len
+            bot.pos = pos
             @info "YOUR CHAT REACHED MAXIMUM SEQUENCE LENGTH!"
             break
         end
